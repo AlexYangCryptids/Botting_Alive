@@ -1,0 +1,85 @@
+[gd_scene load_steps=5 format=3 uid="uid://b524s0bjjh1sk"]
+
+[ext_resource type="Script" path="res://grid_container.gd" id="1_byxcb"]
+[ext_resource type="Script" path="res://control.gd" id="1_roef2"]
+[ext_resource type="AudioStream" uid="uid://ddwk31xsierph" path="res://button_beep.wav" id="2_f7qx4"]
+[ext_resource type="Theme" uid="uid://7xe3ua6la8hr" path="res://new_theme.tres" id="3_2u571"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 156.0
+offset_top = 56.0
+offset_right = 370.0
+offset_bottom = 302.0
+script = ExtResource("1_roef2")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Control"]
+stream = ExtResource("2_f7qx4")
+
+[node name="GridContainer" type="GridContainer" parent="Control"]
+layout_mode = 0
+offset_right = 83.0
+offset_bottom = 156.0
+theme = ExtResource("3_2u571")
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 1
+columns = 3
+script = ExtResource("1_byxcb")
+
+[node name="Button" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.0
+text = "1"
+
+[node name="Button2" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "2"
+
+[node name="Button3" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "3"
+
+[node name="Button4" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "4"
+
+[node name="Button5" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "5"
+
+[node name="Button6" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "6"
+
+[node name="Button7" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "7"
+
+[node name="Button8" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "8"
+
+[node name="Button9" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "9"
+
+[node name="Button10" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "#"
+
+[node name="Button11" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="Button12" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_constants/h_separation = 7
+theme_override_constants/icon_max_width = 6
+theme_override_constants/align_to_largest_stylebox = 7
+text = "*"
