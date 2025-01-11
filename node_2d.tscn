@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b524s0bjjh1sk"]
+[gd_scene load_steps=4 format=3 uid="uid://b524s0bjjh1sk"]
 
 [ext_resource type="Script" path="res://grid_container.gd" id="1_byxcb"]
 [ext_resource type="Theme" uid="uid://7xe3ua6la8hr" path="res://new_theme.tres" id="3_2u571"]
+[ext_resource type="AudioStream" uid="uid://ccdkbnmd7ntnj" path="res://audio/voicebot1_main/GP_opening.mp3" id="3_i0mts"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -35,6 +36,7 @@ columns = 3
 script = ExtResource("1_byxcb")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Control/GridContainer"]
+stream = ExtResource("3_i0mts")
 
 [node name="Button" type="Button" parent="Control/GridContainer"]
 custom_minimum_size = Vector2(100, 100)
