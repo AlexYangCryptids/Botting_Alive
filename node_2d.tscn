@@ -38,7 +38,9 @@ script = ExtResource("1_byxcb")
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Control/GridContainer"]
 stream = ExtResource("3_i0mts")
 
-[node name="Button" type="Button" parent="Control/GridContainer"]
+[node name="BeepPlayer" type="AudioStreamPlayer" parent="Control/GridContainer"]
+
+[node name="Button1" type="Button" parent="Control/GridContainer"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -91,7 +93,7 @@ custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 text = "#"
 
-[node name="Button11" type="Button" parent="Control/GridContainer"]
+[node name="Button0" type="Button" parent="Control/GridContainer"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 text = "0"

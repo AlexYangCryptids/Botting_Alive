@@ -1,34 +1,118 @@
 extends GridContainer
 
-@onready var audio_player = $AudioStreamPlayer  # Reference to the AudioStreamPlayer
+@onready var audio_player = $AudioStreamPlayer
+@onready var beep_player = $BeepPlayer # Reference to the AudioStreamPlayer
 @onready var info_label = get_node('../Label')
-var sound_queue = []  # List to hold the queue of sounds
+
+var can_proceed = false
 var dial_sequence = []
 var target_sequence = [8, 8, 8, 6, 6, 0, 5, 8, 9, 0]
+#var target_sequence = [ 5, 8, 9, 0]
 var current_directory_path = "res://audio/voicebot1_main/"  # Start path
-
+var folder_structure = {}
+var current_node_array = []
 
 func _ready():
-	# first customized that size
 	var font_size = 24  # Desired font size
 	
 	for button in self.get_children():
 		if button is Button:
 			button.set_custom_minimum_size(Vector2(100, 100))
-			# Get the button's default font
-			
+	# Initialize the audio players and add them to the tree
+	
 	var root_path = "res://audio/voicebot1_main"
-	var folder_structure = read_directory_structure(root_path)
+	folder_structure = read_directory_structure(root_path) # update golable folder_structure
 	print(folder_structure)
 		
 	# Connect the finished signal of the AudioStreamPlayer
 	audio_player.connect("finished", Callable(self, "_on_audio_finished"))
 
+	# Connect button signals
 	for button in self.get_children():
 		if button is Button:
-			button.connect("pressed", Callable(self, "_on_button_pressed").bind(button.text.to_int()))
-			#button.connect("pressed", "_on_button_pressed")
+			button.connect("pressed", Callable(self, "_on_button_pressed_dial").bind(int(button.text)))
 			
+func _on_audio_finished():
+	can_proceed = true  # Allow button main functions to proceed now that audio has finished
+
+
+func _on_button_pressed_dial(value):
+	play_beep_sound()
+	print(value)
+	dial_sequence.append(value)
+	if len(dial_sequence) > len(target_sequence):
+		dial_sequence.pop_front()  # Keep the sequence within the correct length
+
+	# Check if the entered sequence matches the target sequence
+	if dial_sequence == target_sequence:
+		print("Correct sequence entered.")
+		execute_main_logic()
+
+func play_beep_sound():
+	var beep_stream = load('res://audio/button_beep.wav')
+	beep_player.stream = beep_stream
+	beep_player.play()
+
+func execute_main_logic():
+	print("Executing main logic...")
+	for i in range(get_child_count()):
+			var button = get_child(i)
+			if button is Button:
+				button.disconnect("pressed", Callable(self, "_on_button_pressed_dial"))
+				button.connect("pressed", Callable(self, "_on_button_pressed_menu").bind(button.text))
+
+	
+	navigate_to(current_node_array)  # Start at the root of the directory
+	
+func navigate_to(node_array):
+	var menu_path = "res://audio/voicebot1_main/" + "/".join(node_array) + '/'
+	var current_node = folder_structure
+	for key in node_array:
+		if key in current_node:
+			current_node = current_node[key]  # Move deeper into the dictionary
+		else:
+			print("Key not found in the current path: ", key)
+			return null  # Return null if any key in the path is not found
+			
+	if typeof(current_node) == TYPE_DICTIONARY:
+		# Assume each folder has an audio file as its first element
+		for key in current_node:
+			print(current_node[key])
+			if typeof(current_node[key]) == TYPE_STRING and current_node[key] == "file":
+				print(menu_path + key)
+				play_audio(menu_path + key)
+				break
+	
+			
+func _on_button_pressed_menu(button_text):
+	play_beep_sound()
+	print("Button pressed for folder:", button_text)
+	if can_proceed == true:
+		var current_node = folder_structure
+		for key in current_node_array:
+			if key in current_node:
+				current_node = current_node[key]  
+			else:
+				current_node = null
+		
+		if current_node:
+			for node_keys in current_node.keys():
+				if node_keys.begins_with(button_text):
+					current_node_array.append(node_keys)
+		
+					print(current_node_array)
+					navigate_to(current_node_array)
+
+	
+
+func play_audio(file_path):
+	print("Playing audio:", file_path)
+	var audio_stream = load(file_path)
+	if audio_stream:
+		audio_player.stream = audio_stream
+		audio_player.play()
+		can_proceed = false
+
 # Function to recursively read directory structure and build a nested dictionary
 func read_directory_structure(path):
 	var structure = {}
@@ -45,75 +129,3 @@ func read_directory_structure(path):
 		filename = directory.get_next()
 	directory.list_dir_end()
 	return structure
-
-func _on_button_pressed(value):
-	dial_sequence.append(value)
-	check_dial_sequence()
-
-func check_dial_sequence():
-	if dial_sequence.size() > target_sequence.size():
-		dial_sequence.pop_front()  # Keep the sequence within the target size
-
-	if dial_sequence == target_sequence:
-		play_current_directory_audio()
-		print("Dial sequence correct. Entering the folder.")
-
-func play_current_directory_audio():
-	var directory = DirAccess.open(current_directory_path)
-	if directory:
-		directory.list_dir_begin()
-		var filename = directory.get_next()
-		while filename != "":
-			if filename.ends_with(".mp3") or filename.ends_with(".wav") :
-				audio_player.stream = load(current_directory_path + filename)
-				audio_player.play()
-				break
-			filename = directory.get_next()
-		directory.list_dir_end()
-	else:
-		print("Failed to open directory: ", current_directory_path)
-		
-		
-'''
-func _on_button_pressed(button: Button):
-	var button_text = button.text
-	# Play the default beep sound first
-	queue_next_sound("res://audio/button_beep.wav")  # Replace with your default beep sound path
-
-	# Queue the button-specific sound to be played next
-	match button_text:
-		'1':
-			queue_next_sound("res://audio/pay_rent.mp3")
-			info_label.text = "Paying Rent..."
-		'2':
-			queue_next_sound("res://audio/check_balance.mp3")
-			info_label.text = 'balance'
-		"3":
-			queue_next_sound("res://audio/outage.mp3")
-			info_label.text = 'outage'
-		"9":
-			queue_next_sound("res://audio/help.mp3")
-		_:
-			print('bruh') # No specific sound for unmatched buttons
-
-func queue_next_sound(audio_path: String):
-	sound_queue.append(audio_path)  # Add the sound path to the queue
-	if not audio_player.is_playing():
-		play_next_sound()  # If nothing is currently playing, start playing
-
-func play_next_sound():
-	if sound_queue.size() > 0:
-		var next_sound_path = sound_queue.pop_front()  # Remove the first element and get it
-		play_voice(next_sound_path)
-
-func _on_audio_finished():
-	play_next_sound()  # Play the next sound in the queue when the current one finishes
-
-func play_voice(audio_path: String):
-	var sound = load(audio_path) as AudioStream
-	if sound:
-		audio_player.stream = sound
-		audio_player.play()
-	else:
-		print("Failed to load sound:", audio_path)
-'''
